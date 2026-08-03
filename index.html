@@ -388,6 +388,7 @@ form, .detail-body{ padding:20px 22px; display:flex; flex-direction:column; gap:
   .kanban{ grid-template-columns:none; grid-auto-flow:column; grid-auto-columns:82%; overflow-x:auto; scroll-snap-type:x mandatory; padding-bottom:8px; -webkit-overflow-scrolling:touch; }
   .kanban-col{ scroll-snap-align:start; }
 }
+.filters-toggle-btn{ display:none; }
 @media (max-width:640px){
   .kpis{ grid-template-columns:repeat(2,1fr); }
   .header-inner{ align-items:flex-start; }
@@ -395,6 +396,20 @@ form, .detail-body{ padding:20px 22px; display:flex; flex-direction:column; gap:
   .calendar-grid{ gap:3px; }
   .logo-img{ height:32px; }
   .logo-badge{ padding:6px 10px; }
+  .verse-strip{ display:none; }
+  .logo-badge{ display:none; }
+  .header-sub{ display:none; }
+  .flip-clock{ display:none; }
+  .weather-chip{ display:none; }
+  .header-date{ display:none; }
+  .header .btn-create{ display:none; }
+  .header-inner{ padding:14px 20px; }
+  .filters-toggle-btn{ display:inline-flex; }
+  .filter-group{ display:none; width:100%; order:5; }
+  #filter-groupby{ display:none; }
+  .toolbar.filters-open .filter-group{ display:flex; flex-wrap:wrap; }
+  .toolbar.filters-open #filter-groupby{ display:block; width:100%; }
+  .toolbar.filters-open .filters-toggle-btn{ background:var(--accent-tint); color:var(--accent-dark); border-color:rgba(14,110,153,.3); }
 }
 @media (max-width:560px){
   .field-row, .field-row-3{ grid-template-columns:1fr; }
@@ -486,6 +501,10 @@ form, .detail-body{ padding:20px 22px; display:flex; flex-direction:column; gap:
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="9" r="6"/><path d="M17 17l-4-4" stroke-linecap="round"/></svg>
           <input type="text" id="filter-search" placeholder="Buscar tarea, proyecto o responsable…" autocomplete="off">
         </div>
+        <button type="button" class="btn btn-ghost filters-toggle-btn" id="btn-toggle-filters">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h12M7 10h6M9 14h2"/></svg>
+          Filtros
+        </button>
         <div class="filter-group">
           <select id="filter-proyecto"><option value="Todos">Todos los proyectos</option></select>
           <select id="filter-responsable"><option value="Todos">Todos los responsables</option></select>
@@ -1725,6 +1744,9 @@ function bindEvents(){
     renderAll();
   });
   document.getElementById('btn-export').addEventListener('click', exportCSV);
+  document.getElementById('btn-toggle-filters').addEventListener('click', function(){
+    document.querySelector('.toolbar').classList.toggle('filters-open');
+  });
 
   var groupBySel = document.getElementById('filter-groupby');
   document.querySelectorAll('.view-btn').forEach(function(btn){
