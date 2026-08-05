@@ -117,6 +117,7 @@ button{ font-family:inherit; }
 .logo-img{ height:40px; width:auto; display:block; }
 .eyebrow{ font-family:var(--font-mono); font-size:11px; letter-spacing:.12em; color:#8FC9E0; text-transform:uppercase; display:block; margin-bottom:6px; }
 .header-id h1{ font-size:26px; font-weight:700; color:#fff; letter-spacing:-.01em; margin-bottom:4px; }
+.beta-badge{ display:inline-flex; align-items:center; vertical-align:middle; margin-left:10px; font-family:var(--font-mono); font-size:10.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#1B2A3A; background:var(--amber); padding:3px 9px; border-radius:999px; }
 .header-sub{ font-size:13px; color:rgba(255,255,255,.65); }
 .header-actions{ display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
 .header-date{ font-family:var(--font-mono); font-size:11.5px; color:rgba(255,255,255,.55); text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; }
@@ -315,6 +316,9 @@ td.overdue{ color:var(--red); font-weight:700; font-family:var(--font-mono); }
 
 /* ---------- FAB ---------- */
 .fab{ position:fixed; right:24px; bottom:24px; width:54px; height:54px; border-radius:50%; background:var(--amber); color:#1B2A3A; border:none; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 20px rgba(217,130,27,.4); cursor:pointer; z-index:40; transition:transform .15s ease, background .15s ease; }
+.fab-feedback{ bottom:88px; width:46px; height:46px; background:var(--ink); color:#fff; box-shadow:0 8px 20px rgba(22,32,44,.35); }
+.fab-feedback:hover{ background:#0d151d; }
+.fab-feedback svg{ width:20px; height:20px; }
 .fab:hover{ background:#C77414; transform:scale(1.06); }
 .fab svg{ width:22px; height:22px; }
 
@@ -330,6 +334,8 @@ td.overdue{ color:var(--red); font-weight:700; font-family:var(--font-mono); }
 form, .detail-body{ padding:20px 22px; display:flex; flex-direction:column; gap:14px; }
 .field{ display:flex; flex-direction:column; gap:5px; font-size:13px; color:var(--ink-soft); font-weight:600; }
 .field input, .field select, .field textarea{ font-family:var(--font-sans); font-size:14px; font-weight:400; color:var(--ink); padding:9px 11px; border:1px solid var(--line); border-radius:var(--radius-sm); background:var(--surface); }
+.field.field-error input, .field.field-error select{ border-color:var(--red); background:var(--red-tint); }
+.field.field-error span{ color:var(--red); }
 .field input:focus, .field select:focus, .field textarea:focus{ outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent); }
 .field textarea{ resize:vertical; font-family:var(--font-sans); }
 .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
@@ -368,6 +374,7 @@ form, .detail-body{ padding:20px 22px; display:flex; flex-direction:column; gap:
 
 /* ---------- Hidden-state safety net ---------- */
 #loading-screen[hidden],
+#beta-badge[hidden],
 #weather-chip[hidden],
 #auth-screen[hidden],
 #empty-state[hidden],
@@ -375,6 +382,8 @@ form, .detail-body{ padding:20px 22px; display:flex; flex-direction:column; gap:
 #kanban-view[hidden],
 #table-view[hidden],
 #modal-new[hidden],
+#btn-feedback[hidden],
+#modal-feedback[hidden],
 #modal-detail[hidden]{
   display:none !important;
 }
@@ -465,7 +474,7 @@ form, .detail-body{ padding:20px 22px; display:flex; flex-direction:column; gap:
           </div>
           <div class="header-id">
             <span class="eyebrow">Panel de seguimiento</span>
-            <h1>Tareas &amp; Pendientes</h1>
+            <h1>Tareas &amp; Pendientes <span class="beta-badge" id="beta-badge" hidden>BETA · en desarrollo</span></h1>
             <p class="header-sub">Gerencia de Construcciones y Operaciones · Consorcio JGL Casatua</p>
           </div>
         </div>
@@ -655,6 +664,30 @@ form, .detail-body{ padding:20px 22px; display:flex; flex-direction:column; gap:
   <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg>
 </button>
 
+<button class="fab fab-feedback" id="btn-feedback" aria-label="Comentarios y sugerencias" title="Comentarios y sugerencias" hidden>
+  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H9l-4 3v-3H5a2 2 0 0 1-2-2V5z"/></svg>
+</button>
+
+<div class="modal-overlay" id="modal-feedback" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-feedback-title">
+    <div class="modal-head">
+      <h2 id="modal-feedback-title">Comentarios y sugerencias</h2>
+      <button class="modal-close" id="close-modal-feedback" aria-label="Cerrar">×</button>
+    </div>
+    <form id="form-feedback">
+      <p style="font-size:13px; color:var(--ink-soft); margin:0;">Esta app está en fase beta. Contame qué anduvo bien, qué falló, o qué le agregarías antes de la versión oficial.</p>
+      <label class="field">
+        <span>Tu comentario</span>
+        <textarea id="fb-comentario" rows="5" maxlength="1000" placeholder="Escribí acá tu comentario o sugerencia…" required></textarea>
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="cancel-feedback">Cancelar</button>
+        <button type="submit" class="btn btn-create">Enviar comentario</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <datalist id="dl-proyectos">
   <option value="Cosmopolitan"></option>
   <option value="Artemio"></option>
@@ -688,24 +721,25 @@ form, .detail-body{ padding:20px 22px; display:flex; flex-direction:column; gap:
     <form id="form-new-task">
       <label class="field">
         <span>Título *</span>
-        <input type="text" id="f-titulo" required maxlength="140" placeholder="Ej: Corrección de bajadas pluviales — Artemio">
+        <input type="text" id="f-titulo" maxlength="140" placeholder="Ej: Corrección de bajadas pluviales — Artemio">
       </label>
       <div class="field-row">
         <label class="field">
-          <span>Proyecto</span>
+          <span>Proyecto *</span>
           <input type="text" id="f-proyecto" list="dl-proyectos" placeholder="Seleccioná o escribí…">
         </label>
         <label class="field">
-          <span>Responsable</span>
+          <span>Responsable *</span>
           <input type="text" id="f-responsable" list="dl-responsables" placeholder="Seleccioná o escribí…">
         </label>
       </div>
       <div class="field-row">
         <label class="field">
-          <span>Prioridad</span>
+          <span>Prioridad *</span>
           <select id="f-prioridad">
+            <option value="" selected disabled>Seleccioná…</option>
             <option value="Alta">Alta</option>
-            <option value="Media" selected>Media</option>
+            <option value="Media">Media</option>
             <option value="Baja">Baja</option>
           </select>
         </label>
@@ -721,7 +755,7 @@ form, .detail-body{ padding:20px 22px; display:flex; flex-direction:column; gap:
       </div>
       <div class="field-row">
         <label class="field">
-          <span>Fecha límite</span>
+          <span>Fecha límite *</span>
           <input type="date" id="f-fecha">
         </label>
         <label class="field">
@@ -1374,6 +1408,25 @@ function renderHeaderDate(){
   document.getElementById('header-date').textContent = fmtDate(todayISO());
 }
 
+/* ============ BETA (agosto 2026) ============ */
+var BETA_START = '2026-08-01';
+var BETA_END = '2026-08-31';
+function checkBetaPeriod(){
+  var today = todayISO();
+  var isBeta = today >= BETA_START && today <= BETA_END;
+  document.getElementById('beta-badge').hidden = !isBeta;
+  document.getElementById('btn-feedback').hidden = !isBeta;
+}
+
+function submitFeedback(texto){
+  if(!sbClient || !currentUser) return Promise.reject(new Error('Sin sesión'));
+  return sbClient.from('feedback').insert({
+    user_id: currentUser.id,
+    user_email: currentUser.email,
+    comentario: texto
+  });
+}
+
 /* ============ Clima (Open-Meteo — sin clave, CORS libre, no depende de Claude) ============ */
 var WEATHER_LAT = -25.2637;
 var WEATHER_LON = -57.5759;
@@ -1635,6 +1688,10 @@ function closeNewTaskModal(){
   document.getElementById('modal-new').hidden = true;
   document.body.classList.remove('modal-open');
 }
+function closeFeedbackModal(){
+  document.getElementById('modal-feedback').hidden = true;
+  document.body.classList.remove('modal-open');
+}
 function openDetail(id){
   selectedId = id;
   renderDetailModal(id);
@@ -1653,6 +1710,38 @@ function bindEvents(){
   document.getElementById('btn-new-task-header').addEventListener('click', openNewTaskModal);
   document.getElementById('btn-new-task-empty').addEventListener('click', openNewTaskModal);
   document.getElementById('btn-fab').addEventListener('click', openNewTaskModal);
+  document.getElementById('btn-feedback').addEventListener('click', function(){
+    document.getElementById('fb-comentario').value = '';
+    document.getElementById('modal-feedback').hidden = false;
+    document.body.classList.add('modal-open');
+    setTimeout(function(){ document.getElementById('fb-comentario').focus(); }, 40);
+  });
+  document.getElementById('close-modal-feedback').addEventListener('click', closeFeedbackModal);
+  document.getElementById('cancel-feedback').addEventListener('click', closeFeedbackModal);
+  document.getElementById('modal-feedback').addEventListener('click', function(e){
+    if(e.target === document.getElementById('modal-feedback')) closeFeedbackModal();
+  });
+  document.getElementById('form-feedback').addEventListener('submit', function(e){
+    e.preventDefault();
+    var texto = document.getElementById('fb-comentario').value.trim();
+    if(!texto){ showToast('Escribí un comentario antes de enviar.', 'error'); return; }
+    var btn = e.target.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    submitFeedback(texto).then(function(res){
+      btn.disabled = false;
+      if(res && res.error){
+        console.error('Error al enviar comentario:', res.error);
+        showToast('No se pudo enviar el comentario. Intentá de nuevo.', 'error');
+        return;
+      }
+      showToast('¡Gracias! Tu comentario quedó registrado.', 'success');
+      closeFeedbackModal();
+    }).catch(function(err){
+      btn.disabled = false;
+      console.error('Error al enviar comentario:', err);
+      showToast('No se pudo enviar el comentario. Intentá de nuevo.', 'error');
+    });
+  });
   document.getElementById('close-modal-new').addEventListener('click', closeNewTaskModal);
   document.getElementById('cancel-new-task').addEventListener('click', closeNewTaskModal);
   document.getElementById('close-modal-detail').addEventListener('click', closeDetailModal);
@@ -1666,14 +1755,32 @@ function bindEvents(){
     if(e.key==='Escape'){
       if(!modalDetailEl.hidden) closeDetailModal();
       else if(!modalNewEl.hidden) closeNewTaskModal();
+      else if(!document.getElementById('modal-feedback').hidden) closeFeedbackModal();
     }
   });
 
+  var REQUIRED_NEW_TASK_FIELDS = ['f-titulo', 'f-proyecto', 'f-responsable', 'f-prioridad', 'f-fecha'];
+  function clearNewTaskFieldErrors(){
+    REQUIRED_NEW_TASK_FIELDS.forEach(function(id){
+      document.getElementById(id).closest('.field').classList.remove('field-error');
+    });
+  }
   document.getElementById('form-new-task').addEventListener('submit', function(e){
     e.preventDefault();
     try{
+      clearNewTaskFieldErrors();
+      var missing = REQUIRED_NEW_TASK_FIELDS.filter(function(id){
+        return !document.getElementById(id).value.trim();
+      });
+      if(missing.length){
+        missing.forEach(function(id){
+          document.getElementById(id).closest('.field').classList.add('field-error');
+        });
+        document.getElementById(missing[0]).focus();
+        showToast('Completá los campos marcados en rojo antes de guardar.', 'error');
+        return;
+      }
       var titulo = document.getElementById('f-titulo').value.trim();
-      if(!titulo){ showToast('El título es obligatorio.', 'error'); return; }
       addTask({
         titulo: titulo,
         proyecto: document.getElementById('f-proyecto').value,
@@ -1936,7 +2043,18 @@ function safeRun(label, fn){
   try{ fn(); }catch(e){ console.error(label + ' failed:', e); }
 }
 
+var dashboardStarted = false;
 function startDashboardForUser(){
+  if(dashboardStarted){
+    // La sesión se revalidó (renovación de token, cambio de foco, etc.) pero el
+    // tablero ya está armado — solo asegurar que se vea, sin re-conectar nada.
+    document.getElementById('loading-screen').hidden = true;
+    document.getElementById('auth-screen').hidden = true;
+    document.getElementById('app-shell').hidden = false;
+    return;
+  }
+  dashboardStarted = true;
+
   var revealed = false;
   function reveal(){
     if(revealed) return;
@@ -1951,6 +2069,7 @@ function startDashboardForUser(){
     clearTimeout(failSafeTimer);
     reveal();
     safeRun('renderHeaderDate', renderHeaderDate);
+    safeRun('checkBetaPeriod', checkBetaPeriod);
     safeRun('renderVerseOfDay', renderVerseOfDay);
     safeRun('initStorageNotice', initStorageNotice);
     safeRun('bindEvents', bindEvents);
@@ -2017,6 +2136,7 @@ function init(){
       startDashboardForUser();
     } else {
       currentUser = null;
+      dashboardStarted = false;
       document.getElementById('loading-screen').hidden = true;
       document.getElementById('app-shell').hidden = true;
       document.getElementById('auth-screen').hidden = false;
