@@ -326,6 +326,19 @@ td.overdue{ color:var(--red); font-weight:700; font-family:var(--font-mono); }
 .modal-overlay{ position:fixed; inset:0; background:rgba(13,20,30,.55); display:flex; align-items:center; justify-content:center; z-index:100; padding:20px; }
 .modal{ background:var(--surface); border-radius:var(--radius-lg); width:100%; max-width:520px; max-height:88vh; overflow-y:auto; box-shadow:var(--shadow); animation:modal-in .18s ease; }
 .modal-detail{ max-width:660px; }
+.modal-help{ max-width:740px; }
+.help-body{ padding:20px 26px 26px; }
+.help-callout{ background:var(--amber-tint); border:1px solid rgba(217,130,27,.35); border-radius:var(--radius-sm); padding:14px 16px; margin-bottom:22px; }
+.help-callout strong{ display:block; margin-bottom:5px; font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; color:#7A4A0E; font-family:var(--font-mono); }
+.help-callout p{ color:#5B3A0E; font-size:13px; margin:0; line-height:1.55; }
+.help-section{ margin-bottom:22px; }
+.help-section:last-child{ margin-bottom:0; }
+.help-section h3{ font-size:15.5px; font-weight:700; color:var(--ink); margin:0 0 10px; padding-bottom:7px; border-bottom:2px solid var(--line-soft); }
+.help-section h4{ font-size:12.5px; font-weight:700; color:var(--accent-dark); margin:14px 0 6px; text-transform:uppercase; letter-spacing:.02em; }
+.help-section p{ font-size:13.5px; line-height:1.6; color:var(--ink); margin:0 0 10px; }
+.help-section ul, .help-section ol{ margin:0 0 10px; padding-left:22px; }
+.help-section li{ font-size:13.5px; line-height:1.55; color:var(--ink); margin-bottom:5px; }
+.help-note{ font-size:12.5px; font-style:italic; color:var(--ink-soft); }
 @keyframes modal-in{ from{ opacity:0; transform:translateY(8px) scale(.98); } to{ opacity:1; transform:translateY(0) scale(1); } }
 .modal-head{ display:flex; align-items:center; justify-content:space-between; padding:18px 22px; border-bottom:1px solid var(--line-soft); position:sticky; top:0; background:var(--surface); z-index:2; }
 .modal-head h2{ font-size:17px; font-weight:700; }
@@ -384,6 +397,7 @@ form, .detail-body{ padding:20px 22px; display:flex; flex-direction:column; gap:
 #modal-new[hidden],
 #btn-feedback[hidden],
 #modal-feedback[hidden],
+#modal-help[hidden],
 #modal-detail[hidden]{
   display:none !important;
 }
@@ -653,6 +667,7 @@ form, .detail-body{ padding:20px 22px; display:flex; flex-direction:column; gap:
   <footer class="footer">
     <span id="footer-storage-note">Sincronizado con tu cuenta — disponible en todos tus dispositivos.</span>
     <span class="footer-right">
+      <button type="button" id="btn-open-help" class="footer-logout">Protocolo de uso</button>
       <span id="footer-status"></span>
       <span id="footer-user-email" class="footer-user-email"></span>
       <button type="button" id="btn-logout" class="footer-logout">Cerrar sesión</button>
@@ -685,6 +700,139 @@ form, .detail-body{ padding:20px 22px; display:flex; flex-direction:column; gap:
         <button type="submit" class="btn btn-create">Enviar comentario</button>
       </div>
     </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-help" hidden>
+  <div class="modal modal-help" role="dialog" aria-modal="true" aria-labelledby="modal-help-title">
+    <div class="modal-head">
+      <h2 id="modal-help-title">Protocolo de uso</h2>
+      <button class="modal-close" id="close-modal-help" aria-label="Cerrar">×</button>
+    </div>
+    <div class="help-body">
+      <div class="help-callout">
+        <strong>Versión BETA — en desarrollo (agosto 2026)</strong>
+        <p>Esta aplicación está en período de prueba. Es normal que algo no funcione perfecto todavía — para eso estamos probándola. Usá el botón de comentarios (💬, flotante) para avisar cualquier error o idea de mejora.</p>
+      </div>
+
+      <div class="help-section">
+        <h3>1. ¿Qué es este panel?</h3>
+        <p>Es una herramienta personal para registrar, organizar y hacer seguimiento de tus tareas y pendientes de trabajo. Además de las tareas, integra un calendario mensual con tus reuniones de Google Calendar, KPIs con el estado general de un vistazo, sincronización automática entre dispositivos, y la posibilidad de instalarla como app.</p>
+      </div>
+
+      <div class="help-section">
+        <h3>2. Importante: por ahora es un panel individual</h3>
+        <p>Cada persona que la usa tiene su propia cuenta y ve únicamente sus propias tareas — no es un tablero compartido ni colectivo todavía. Lo que vos cargás, lo ves solo vos. Si funciona bien y hay interés, más adelante se puede evaluar una versión donde un equipo comparta el mismo tablero.</p>
+      </div>
+
+      <div class="help-section">
+        <h3>3. Fase BETA — agosto 2026</h3>
+        <p>Vas a ver la etiqueta "BETA · en desarrollo" junto al título mientras dure esta fase. El botón flotante oscuro (💬) es para dejar comentarios y sugerencias: qué no funcionó, qué falta, qué te resultó confuso. Todo queda registrado y se revisa antes de la versión oficial.</p>
+      </div>
+
+      <div class="help-section">
+        <h3>4. Cómo entrar por primera vez</h3>
+        <ol>
+          <li>Abrí la dirección de la aplicación.</li>
+          <li>Si es tu primera vez, tocá "¿Primera vez acá? Crear cuenta".</li>
+          <li>Ingresá tu correo y una contraseña (mínimo 6 caracteres).</li>
+          <li>Las próximas veces, entrá con ese mismo correo y contraseña.</li>
+        </ol>
+        <p class="help-note">Tus datos quedan guardados en la nube, no en el dispositivo — iniciando sesión desde otra computadora o celular con la misma cuenta, vas a ver las mismas tareas.</p>
+      </div>
+
+      <div class="help-section">
+        <h3>5. Recorrido por la pantalla principal</h3>
+        <h4>Encabezado</h4>
+        <ul>
+          <li>Logo, título y un versículo bíblico que cambia cada día.</li>
+          <li>Reloj y clima actual de Asunción.</li>
+          <li>Botón "+ Nueva tarea".</li>
+        </ul>
+        <h4>Indicadores (KPIs)</h4>
+        <ul>
+          <li>Total de tareas, Pendientes, En progreso, Completadas, Atrasadas y Avance promedio.</li>
+        </ul>
+        <h4>Calendario y Próximas reuniones</h4>
+        <ul>
+          <li>Calendario navegable mes a mes, con puntos: azul si hay reunión, ámbar si vence una tarea.</li>
+        </ul>
+        <h4>Barra de búsqueda y filtros</h4>
+        <ul>
+          <li>Buscador, filtros combinables, y selector para agrupar el tablero.</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h3>6. Cómo crear una tarea nueva</h3>
+        <ol>
+          <li>Tocá "+ Nueva tarea" (arriba) o el botón naranja flotante (+), siempre visible.</li>
+          <li>Completá el formulario. Estos 5 campos son <strong>obligatorios</strong> y se marcan en rojo si faltan: Título, Proyecto, Responsable, Prioridad y Fecha límite.</li>
+          <li>Estado inicial, Avance inicial y Descripción son opcionales.</li>
+          <li>Tocá "Guardar tarea".</li>
+        </ol>
+      </div>
+
+      <div class="help-section">
+        <h3>7. Cómo hacer seguimiento de avance</h3>
+        <ol>
+          <li>Tocá cualquier tarjeta o fila para abrir el detalle.</li>
+          <li>Movés el control deslizante de "Avance actual".</li>
+          <li>Opcional: escribí un comentario.</li>
+          <li>Tocá "Registrar avance" — queda guardado con fecha y hora en el historial.</li>
+        </ol>
+        <p>Desde esa misma pantalla también podés editar cualquier dato, marcarla como completada, o eliminarla.</p>
+      </div>
+
+      <div class="help-section">
+        <h3>8. Cómo cambiar el estado de una tarea</h3>
+        <ul>
+          <li>Vista Tablero: arrastrá la tarjeta a la columna correspondiente.</li>
+          <li>O abrí el detalle y cambiá el campo "Estado" directamente.</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h3>9. Vista Tablero, Vista Lista, y Agrupar por</h3>
+        <p>Alterná entre "Tablero" (tarjetas) y "Lista" (tabla). El selector "Agrupar" cambia cómo se organizan las columnas: por Estado, por Obra, o por Responsable.</p>
+      </div>
+
+      <div class="help-section">
+        <h3>10. Filtros, búsqueda y exportar</h3>
+        <ul>
+          <li>El buscador filtra por título, proyecto, responsable o descripción.</li>
+          <li>Los filtros se pueden combinar entre sí.</li>
+          <li>"Exportar CSV" descarga las tareas que estás viendo (respeta los filtros activos).</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h3>11. Sobre el calendario y las reuniones</h3>
+        <p>Refleja tus reuniones de Google Calendar y las fechas límite de tus tareas. Un detalle importante: esa información no se actualiza sola en tiempo real — se actualiza cuando se lo pedís a Claude puntualmente. Si falta una reunión reciente, puede ser solo que todavía no se actualizó ese dato.</p>
+      </div>
+
+      <div class="help-section">
+        <h3>12. Instalarla como aplicación</h3>
+        <ul>
+          <li>Chrome / Edge: ícono de instalar en la barra de direcciones.</li>
+          <li>Android: menú del navegador → "Agregar a pantalla de inicio".</li>
+          <li>iPhone (Safari): compartir → "Agregar a pantalla de inicio".</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h3>13. ¿Encontraste un problema o tenés una idea?</h3>
+        <p>Usá el botón de comentarios (💬) y contame qué estabas tratando de hacer, qué pasó, y qué te gustaría que fuera distinto. No hace falta que sea un problema técnico — también son bienvenidas ideas de mejora.</p>
+      </div>
+
+      <div class="help-section">
+        <h3>14. Contacto</h3>
+        <p><strong>Ing. Antonio Lara Ibáñez</strong> — Gerente de Construcciones y Operaciones, Consorcio JGL Casatua.</p>
+      </div>
+    </div>
+    <div class="modal-actions" style="padding:16px 26px; border-top:1px solid var(--line-soft);">
+      <button type="button" class="btn btn-primary" id="close-modal-help-btn">Entendido</button>
+    </div>
   </div>
 </div>
 
@@ -1692,6 +1840,10 @@ function closeFeedbackModal(){
   document.getElementById('modal-feedback').hidden = true;
   document.body.classList.remove('modal-open');
 }
+function closeHelpModal(){
+  document.getElementById('modal-help').hidden = true;
+  document.body.classList.remove('modal-open');
+}
 function openDetail(id){
   selectedId = id;
   renderDetailModal(id);
@@ -1710,6 +1862,15 @@ function bindEvents(){
   document.getElementById('btn-new-task-header').addEventListener('click', openNewTaskModal);
   document.getElementById('btn-new-task-empty').addEventListener('click', openNewTaskModal);
   document.getElementById('btn-fab').addEventListener('click', openNewTaskModal);
+  document.getElementById('btn-open-help').addEventListener('click', function(){
+    document.getElementById('modal-help').hidden = false;
+    document.body.classList.add('modal-open');
+  });
+  document.getElementById('close-modal-help').addEventListener('click', closeHelpModal);
+  document.getElementById('close-modal-help-btn').addEventListener('click', closeHelpModal);
+  document.getElementById('modal-help').addEventListener('click', function(e){
+    if(e.target === document.getElementById('modal-help')) closeHelpModal();
+  });
   document.getElementById('btn-feedback').addEventListener('click', function(){
     document.getElementById('fb-comentario').value = '';
     document.getElementById('modal-feedback').hidden = false;
@@ -1756,6 +1917,7 @@ function bindEvents(){
       if(!modalDetailEl.hidden) closeDetailModal();
       else if(!modalNewEl.hidden) closeNewTaskModal();
       else if(!document.getElementById('modal-feedback').hidden) closeFeedbackModal();
+      else if(!document.getElementById('modal-help').hidden) closeHelpModal();
     }
   });
 
