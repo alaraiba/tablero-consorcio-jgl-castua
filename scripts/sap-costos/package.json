@@ -1,0 +1,13 @@
+{
+  "name": "sap-costos-obra",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Lee GASTOS TOTALES (USD) por PEP del reporte SAP Costos de Proyecto y los guarda en Supabase",
+  "main": "fetch-sap-costos.js",
+  "scripts": {
+    "start": "node fetch-sap-costos.js"
+  },
+  "dependencies": {
+    "playwright": "^1.47.0"
+  }
+}

@@ -1,0 +1,46 @@
+name: Costos SAP diarios
+
+on:
+  schedule:
+    # 8:00 America/Asuncion. GitHub Actions cron es siempre en UTC y no
+    # sigue cambios de horario de verano -- si Paraguay cambia su offset
+    # respecto a UTC, este horario hay que ajustarlo a mano.
+    # Asuncion = UTC-4 -> 8:00 -04:00 = 12:00 UTC.
+    - cron: '0 12 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  fetch-costos:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: scripts/sap-costos
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Instalar Chromium (Playwright)
+        run: npx playwright install --with-deps chromium
+
+      - name: Leer costos SAP y guardar en Supabase
+        env:
+          SAP_USERNAME: ${{ secrets.SAP_USERNAME }}
+          SAP_PASSWORD: ${{ secrets.SAP_PASSWORD }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: npm start
+
+      - name: Subir capturas de error (si hubo)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sap-costos-debug
+          path: scripts/sap-costos/error-*.png
+          if-no-files-found: ignore
+          retention-days: 14
