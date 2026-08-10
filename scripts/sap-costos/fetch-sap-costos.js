@@ -80,6 +80,24 @@ async function loginToSap(page) {
   ]);
 }
 
+async function handleSacLoginIfPresent(page) {
+  // SAP Analytics Cloud (el story embebido, dominio analytics.cloud.sap)
+  // a veces pide un segundo login propio ("Sign In" / SAC_OEM_...) además
+  // del login normal de SAP S/4HANA -- pasó recién en la 6ta iteración de
+  // 8 durante la primera corrida real, no en la primera carga. Se resuelve
+  // con las mismas credenciales de SAP_USERNAME/SAP_PASSWORD. Se llama
+  // antes de cada PEP porque puede aparecer en cualquier momento.
+  const emailField = page.getByPlaceholder('Email or User Name');
+  const present = await emailField.isVisible({ timeout: 3000 }).catch(() => false);
+  if (!present) return false;
+
+  await emailField.fill(process.env.SAP_USERNAME);
+  await page.getByPlaceholder('Password').fill(process.env.SAP_PASSWORD);
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.waitForTimeout(4000);
+  return true;
+}
+
 async function dismissInitialPromptIfPresent(page) {
   // A veces el story pide "Definir variables" apenas carga, antes de poder
   // filtrar por PEP. Si aparece, la cerramos con Cancelar — cada PEP se
@@ -187,11 +205,22 @@ async function main() {
 
   try {
     await loginToSap(page);
+    await handleSacLoginIfPresent(page);
     await dismissInitialPromptIfPresent(page);
 
     for (const { pep_id, nombre } of PEPS) {
       try {
-        await filterByPep(page, pep_id);
+        await handleSacLoginIfPresent(page);
+        try {
+          await filterByPep(page, pep_id);
+        } catch (err) {
+          // Si "Herramientas" no se pudo clickear, probablemente apareció
+          // el login de SAC justo en este momento y bloqueó la pantalla.
+          // Lo resolvemos y reintentamos este PEP una sola vez.
+          const wasSacLogin = await handleSacLoginIfPresent(page);
+          if (!wasSacLogin) throw err;
+          await filterByPep(page, pep_id);
+        }
         const gastosTotales = await readGastosTotales(page, pep_id);
         rows.push({
           fecha,
