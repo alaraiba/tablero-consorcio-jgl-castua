@@ -79,8 +79,11 @@ async function loginToSap(page) {
   // No usamos "networkidle": el Fiori Launchpad mantiene conexiones de
   // fondo abiertas (notificaciones, polling) que nunca llegan a estar
   // inactivas, así que ese wait nunca se cumple y siempre da timeout.
-  // En cambio esperamos un elemento concreto de la pantalla ya logueada.
-  await page.getByText('Costos de Proyecto').first().waitFor({ timeout: 60000 });
+  // En cambio esperamos que exista un elemento de la pantalla ya logueada.
+  // "attached" en vez de "visible" (default) porque el primer match de
+  // este texto es un <h1 class="sapUiPseudoInvisibleText"> -- accesibilidad
+  // para lectores de pantalla, oculto a propósito -- que nunca sería visible.
+  await page.getByText('Costos de Proyecto').first().waitFor({ state: 'attached', timeout: 60000 });
 }
 
 async function handleSacLoginIfPresent(page) {
