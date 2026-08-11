@@ -89,19 +89,23 @@ async function loginToSap(page) {
 async function handleSacLoginIfPresent(page) {
   // SAP Analytics Cloud (el story embebido, dominio analytics.cloud.sap)
   // a veces pide un segundo login propio ("Sign In" / SAC_OEM_...) además
-  // del login normal de SAP S/4HANA -- pasó recién en la 6ta iteración de
-  // 8 durante la primera corrida real, no en la primera carga. Se resuelve
-  // con las mismas credenciales de SAP_USERNAME/SAP_PASSWORD. Se llama
-  // antes de cada PEP porque puede aparecer en cualquier momento.
-  const emailField = page.getByPlaceholder('Email or User Name');
-  const present = await emailField.isVisible({ timeout: 3000 }).catch(() => false);
-  if (!present) return false;
+  // del login normal de SAP S/4HANA. Puede aparecer en cualquier momento
+  // (a veces en el primer PEP, a veces recién en el 6to) y, a juzgar por
+  // las capturas de error, se renderiza DENTRO del iframe de SAC, no en la
+  // página principal -- por eso hay que buscarlo en page y en cada frame.
+  const contexts = [page, ...page.frames()];
+  for (const ctx of contexts) {
+    const emailField = ctx.getByPlaceholder('Email or User Name');
+    const present = await emailField.isVisible({ timeout: 2000 }).catch(() => false);
+    if (!present) continue;
 
-  await emailField.fill(process.env.SAP_USERNAME);
-  await page.getByPlaceholder('Password').fill(process.env.SAP_PASSWORD);
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.waitForTimeout(4000);
-  return true;
+    await emailField.fill(process.env.SAP_USERNAME);
+    await ctx.getByPlaceholder('Password').fill(process.env.SAP_PASSWORD);
+    await ctx.getByRole('button', { name: 'Continue' }).click();
+    await page.waitForTimeout(4000);
+    return true;
+  }
+  return false;
 }
 
 async function dismissInitialPromptIfPresent(page) {
